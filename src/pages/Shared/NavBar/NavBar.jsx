@@ -1,358 +1,328 @@
-import { useState, useEffect, useRef } from "react";
-import { ShoppingCart, Search, ChevronDown, User, Heart, Menu, X, Bird, Cat, Package, Utensils, Tag, LayoutDashboard, LogOut, Settings, Bell } from "lucide-react";
-import './NavBar.css'
+import React, { useState, useEffect, useRef } from 'react';
+import './Navbar.css';
+import { useCart } from '../../../context/CartContext';
+import { Link } from 'react-router-dom';
 
-const NAV_LINKS = [
+const MENU = [
   {
-    label: "Shop",
-    dropdown: [
-      { label: "Birds", icon: <Bird size={15} />, href: "/shop/birds" },
-      { label: "Cats", icon: <Cat size={15} />, href: "/shop/cats" },
-      { label: "All Pets", icon: <Package size={15} />, href: "/shop/all" },
+    label: 'Women',
+    columns: [
+      { heading: 'Clothing', links: ['Dresses', 'Tops & Blouses', 'Pants', 'Skirts', 'Outerwear'] },
+      { heading: 'Occasion', links: ['Casual Wear', 'Office Wear', 'Party & Evening', 'Activewear'] },
+      { heading: 'Accessories', links: ['Handbags', 'Scarves', 'Jewellery', 'Sunglasses'] },
     ],
   },
   {
-    label: "Food & Treats",
-    dropdown: [
-      { label: "Bird Food", icon: <Utensils size={15} />, href: "/food/birds" },
-      { label: "Cat Food", icon: <Utensils size={15} />, href: "/food/cats" },
+    label: 'Men',
+    columns: [
+      { heading: 'Clothing', links: ['Shirts', 'T-Shirts', 'Pants & Chinos', 'Suits', 'Outerwear'] },
+      { heading: 'Casual', links: ['Polo Shirts', 'Shorts', 'Hoodies', 'Denim'] },
+      { heading: 'Accessories', links: ['Belts', 'Caps & Hats', 'Bags', 'Wallets'] },
     ],
   },
   {
-    label: "Accessories",
-    dropdown: [
-      { label: "Cages & Perches", icon: <Package size={15} />, href: "/accessories/cages" },
-      { label: "Toys", icon: <Package size={15} />, href: "/accessories/toys" },
-      { label: "Grooming", icon: <Package size={15} />, href: "/accessories/grooming" },
+    label: 'Baby & Kids',
+    columns: [
+      { heading: 'Baby (0–2Y)', links: ['Newborn Sets', 'Bodysuits', 'Sleepwear', 'Cardigans'] },
+      { heading: 'Kids (3–10Y)', links: ['T-Shirts', 'Dresses', 'Pants', 'School Wear'] },
+      { heading: 'Accessories', links: ['Hair Clips', 'Socks', 'Shoes', 'Bags'] },
     ],
   },
-  { label: "Sell Your Pet", href: "/sell", dropdown: null },
-  { label: "Adoption", href: "/adopt", dropdown: null },
+  {
+    label: 'Accessories',
+    columns: [
+      { heading: 'Bags', links: ['Tote Bags', 'Shoulder Bags', 'Backpacks', 'Clutches'] },
+      { heading: 'Jewellery', links: ['Necklaces', 'Earrings', 'Bracelets', 'Rings'] },
+      { heading: 'More', links: ['Belts', 'Hats & Caps', 'Sunglasses', 'Scarves'] },
+    ],
+  },
+  { label: 'Sale', columns: [] },
 ];
 
-const PROFILE_MENU = [
-  { label: "Dashboard", icon: <LayoutDashboard size={15} />, href: "/dashboard" },
-  { label: "My Orders", icon: <Package size={15} />, href: "/orders" },
-  { label: "Wishlist", icon: <Heart size={15} />, href: "/wishlist" },
-  { label: "Notifications", icon: <Bell size={15} />, href: "/notifications" },
-  { label: "Settings", icon: <Settings size={15} />, href: "/settings" },
-  { label: "Logout", icon: <LogOut size={15} />, href: "/logout", danger: true },
-];
-
-export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+const Navbar = () => {
+  const [activeMenu, setActiveMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [mobileExpanded, setMobileExpanded] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mobileExpanded, setMobileExpanded] = useState(null);
-
-  const navRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
   const profileRef = useRef(null);
+  const leaveTimer = useRef(null);
+  const { getCartCount } = useCart();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (navRef.current && !navRef.current.contains(e.target)) {
-        setActiveDropdown(null);
+    const handler = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const isLoggedIn = true; // Toggle for demo
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
+  const onEnter = (label) => {
+    clearTimeout(leaveTimer.current);
+    setActiveMenu(label);
+  };
+
+  const onLeave = () => {
+    leaveTimer.current = setTimeout(() => setActiveMenu(null), 120);
+  };
+
+  const activeData = MENU.find((m) => m.label === activeMenu);
 
   return (
     <>
-      {/* Google Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+      <div className='nb-announce'>
+        Free delivery on orders over ৳1,500 &nbsp;·&nbsp; New arrivals every week &nbsp;·&nbsp; Code <strong>STYLE10</strong> = 10% off
+      </div>
 
-       
-      `}</style>
+      <header className={`nb-header${scrolled ? ' nb-header--shadow' : ''}`}>
+        <div className='nb-wrap'>
 
-      <nav
-        ref={navRef}
-        className={`nav-root fixed top-0 left-0 right-0 z-50 transition-all duration-500 cloud-bg ${scrolled
-            ? "bg-[#0f1a14]/95 backdrop-blur-xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border-b border-[#86c5a2]/10"
-            : "bg-gradient-to-b from-[#0a1210]/90 to-transparent backdrop-blur-sm"
-          }`}
-      >
-        {/* Decorative feather shapes */}
-        <svg className="feather-deco top-0 right-32 w-24 h-8" viewBox="0 0 120 40">
-          <path d="M10,20 Q40,-5 80,8 Q110,18 115,22 Q80,35 40,28 Q15,23 10,20Z" fill="#86c5a2" />
-          <path d="M10,20 Q60,15 115,22" stroke="#86c5a2" strokeWidth="0.8" fill="none" />
-        </svg>
-        <svg className="feather-deco top-1 left-48 w-16 h-6" viewBox="0 0 80 30">
-          <path d="M5,15 Q25,-3 55,6 Q72,13 76,16 Q55,26 28,20 Q8,16 5,15Z" fill="#d4a853" />
-          <path d="M5,15 Q40,12 76,16" stroke="#d4a853" strokeWidth="0.6" fill="none" />
-        </svg>
+          <button
+            className={`nb-burger${mobileOpen ? ' nb-burger--x' : ''}`}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label='Menu'
+          >
+            <span /><span /><span />
+          </button>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {/* Main Nav Row */}
-          <div className="flex items-center justify-between h-16">
+          <a href='/' className='nb-logo'>
+            <span className='nb-logo__dot' />
+            <span className='nb-logo__text'>Vougely</span>
+          </a>
 
-            {/* Logo */}
-            <a href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-              <div className="relative w-9 h-9">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#86c5a2] to-[#4a9970] flex items-center justify-center shadow-lg shadow-[#86c5a2]/20 group-hover:shadow-[#86c5a2]/40 transition-shadow duration-300">
-                  <Bird size={18} className="text-[#0a1210]" strokeWidth={2.2} />
-                </div>
-                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#d4a853] border-2 border-[#0f1a14]" />
+          <nav className='nb-nav' onMouseLeave={onLeave}>
+            {MENU.map((item) => (
+              <div key={item.label} className='nb-nav__item' onMouseEnter={() => onEnter(item.label)}>
+                <a
+                  href={`/${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  className={`nb-nav__link${item.label === 'Sale' ? ' nb-nav__link--sale' : ''}${activeMenu === item.label ? ' nb-nav__link--on' : ''}`}
+                >
+                  {item.label}
+                  {item.columns.length > 0 && (
+                    <svg width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'>
+                      <polyline points='6 9 12 15 18 9' />
+                    </svg>
+                  )}
+                </a>
               </div>
-              <div className="flex flex-col leading-none">
-                <span className="logo-text text-[1.15rem] font-bold text-white tracking-wide">NestNook</span>
-                <span className="text-[0.6rem] font-medium tracking-[0.18em] text-[#86c5a2] uppercase">Pets & Beyond</span>
-              </div>
-            </a>
+            ))}
 
-            {/* Desktop Nav Links */}
-            <div className="hidden lg:flex items-center gap-1">
-              {NAV_LINKS.map((link) =>
-                link.dropdown ? (
-                  <div
-                    key={link.label}
-                    className="relative"
-                    onMouseEnter={() => setActiveDropdown(link.label)}
-                    onMouseLeave={() => setActiveDropdown(null)}
-                  >
-                    <button className="nav-link-hover flex items-center gap-1 px-4 py-2 text-sm font-medium text-[#c8d9ce] hover:text-white transition-colors duration-200">
-                      {link.label}
-                      <ChevronDown
-                        size={13}
-                        className={`transition-transform duration-200 ${activeDropdown === link.label ? "rotate-180 text-[#86c5a2]" : ""}`}
-                      />
-                    </button>
-
-                    {activeDropdown === link.label && (
-                      <div className="dropdown-enter absolute top-full left-0 pt-2">
-                        <div className="bg-[#0f1f17]/95 backdrop-blur-xl border border-[#86c5a2]/15 rounded-xl shadow-2xl shadow-black/60 overflow-hidden min-w-[180px]">
-                          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#86c5a2]/40 to-transparent" />
-                          {link.dropdown.map((item) => (
-                            <a
-                              key={item.label}
-                              href={item.href}
-                              className="flex items-center gap-3 px-4 py-3 text-sm text-[#a8c4b0] hover:text-white hover:bg-[#86c5a2]/10 transition-colors duration-150 group/item"
-                            >
-                              <span className="text-[#86c5a2] group-hover/item:scale-110 transition-transform duration-150">
-                                {item.icon}
-                              </span>
-                              {item.label}
-                            </a>
+            {activeData && activeData.columns.length > 0 && (
+              <div className='nb-mega' onMouseEnter={() => clearTimeout(leaveTimer.current)} onMouseLeave={onLeave}>
+                <div className='nb-mega__body'>
+                  <div className='nb-mega__cols'>
+                    {activeData.columns.map((col) => (
+                      <div key={col.heading} className='nb-mega__col'>
+                        <p className='nb-mega__col-title'>{col.heading}</p>
+                        <ul>
+                          {col.links.map((link) => (
+                            <li key={link}>
+                              <a
+                                href={`/${activeData.label.toLowerCase()}/${link.toLowerCase().replace(/[\s&]+/g, '-')}`}
+                                className='nb-mega__link'
+                              >
+                                {link}
+                              </a>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
                       </div>
-                    )}
+                    ))}
+                    <div className='nb-mega__promo'>
+                      <p className='nb-mega__promo-tag'>New This Week</p>
+                      <p className='nb-mega__promo-title'>{activeData.label}<br /><em>Collection</em></p>
+                      <a href={`/${activeData.label.toLowerCase()}/new`} className='nb-mega__promo-btn'>Shop Now</a>
+                    </div>
                   </div>
-                ) : (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="nav-link-hover px-4 py-2 text-sm font-medium text-[#c8d9ce] hover:text-white transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
-                )
+                </div>
+              </div>
+            )}
+          </nav>
+
+          <div className='nb-icons'>
+            <div className='nb-search-wrap'>
+              <button className='nb-icon-btn' onClick={() => setSearchOpen(!searchOpen)} aria-label='Search'>
+                <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                  <circle cx='11' cy='11' r='8' />
+                  <line x1='21' y1='21' x2='16.65' y2='16.65' />
+                </svg>
+              </button>
+              {searchOpen && (
+                <div className='nb-search-drop'>
+                  <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                    <circle cx='11' cy='11' r='8' />
+                    <line x1='21' y1='21' x2='16.65' y2='16.65' />
+                  </svg>
+                  <input autoFocus type='text' placeholder='Search clothes, accessories…' />
+                </div>
               )}
             </div>
 
-            {/* Right Icons */}
-            <div className="flex items-center gap-1.5">
+            <Link to='/wishlist' className='nb-icon-btn' aria-label='Wishlist'>
+              <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                <path d='M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z' />
+              </svg>
+            </Link>
 
-              {/* Search */}
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className={`p-2.5 rounded-xl transition-all duration-200 ${searchOpen
-                    ? "bg-[#86c5a2]/15 text-[#86c5a2]"
-                    : "text-[#a8c4b0] hover:text-white hover:bg-white/5"
-                  }`}
-              >
-                <Search size={18} />
+            <Link to='/cart' className='nb-icon-btn' aria-label='Cart'>
+              <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                <path d='M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z' />
+                <line x1='3' y1='6' x2='21' y2='6' />
+                <path d='M16 10a4 4 0 01-8 0' />
+              </svg>
+              {getCartCount() > 0 && (
+                <span className='nb-cart-badge'>{getCartCount()}</span>
+              )}
+            </Link>
+
+            <div ref={profileRef} className='nb-profile-wrap'>
+              <button className='nb-icon-btn' onClick={() => setProfileOpen(!profileOpen)} aria-label='Profile'>
+                <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                  <circle cx='12' cy='8' r='4' />
+                  <path d='M4 20c0-4 3.6-7 8-7s8 3 8 7' />
+                </svg>
               </button>
-
-              {/* Wishlist */}
-              <button className="hidden sm:flex p-2.5 rounded-xl text-[#a8c4b0] hover:text-[#e8819a] hover:bg-white/5 transition-all duration-200 relative">
-                <Heart size={18} />
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#e8819a]" />
-              </button>
-
-              {/* Cart */}
-              <button className="p-2.5 rounded-xl text-[#a8c4b0] hover:text-white hover:bg-white/5 transition-all duration-200 relative">
-                <ShoppingCart size={18} />
-                <span className="cart-badge absolute -top-0.5 -right-0.5 w-4.5 h-4.5 min-w-[18px] px-1 rounded-full bg-[#d4a853] text-[#0a1210] text-[10px] font-bold flex items-center justify-center leading-none">
-                  3
-                </span>
-              </button>
-
-              {/* Profile */}
-              <div className="relative hidden sm:block" ref={profileRef}>
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className={`flex items-center gap-2 ml-1 pl-3 pr-2 py-1.5 rounded-xl border transition-all duration-200 ${profileOpen
-                      ? "border-[#86c5a2]/40 bg-[#86c5a2]/10"
-                      : "border-transparent hover:border-[#86c5a2]/20 hover:bg-white/5"
-                    }`}
-                >
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#86c5a2] to-[#4a9970] flex items-center justify-center flex-shrink-0">
-                    <User size={14} className="text-[#0a1210]" />
+              {profileOpen && (
+                <div className='nb-profile-drop'>
+                  <div className='nb-profile-drop__head'>
+                    <div className='nb-profile-drop__av'>R</div>
+                    <div>
+                      <p className='nb-profile-drop__name'>Rafiq Ahmed</p>
+                      <p className='nb-profile-drop__mail'>rafiq@email.com</p>
+                    </div>
                   </div>
-                  <ChevronDown
-                    size={13}
-                    className={`text-[#86c5a2] transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                  <div className='nb-profile-drop__sep' />
+                  <a href='/dashboard' className='nb-profile-drop__row nb-profile-drop__row--dash'>
+                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <rect x='3' y='3' width='7' height='7' /><rect x='14' y='3' width='7' height='7' />
+                      <rect x='3' y='14' width='7' height='7' /><rect x='14' y='14' width='7' height='7' />
+                    </svg>
+                    Dashboard
+                  </a>
+                  <a href='/orders' className='nb-profile-drop__row'>
+                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <path d='M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z' />
+                      <polyline points='14 2 14 8 20 8' />
+                    </svg>
+                    My Orders
+                  </a>
+                  <a href='/wishlist' className='nb-profile-drop__row'>
+                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <path d='M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z' />
+                    </svg>
+                    Wishlist
+                  </a>
+                  <a href='/settings' className='nb-profile-drop__row'>
+                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <circle cx='12' cy='12' r='3' />
+                      <path d='M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z' />
+                    </svg>
+                    Settings
+                  </a>
+                  <div className='nb-profile-drop__sep' />
+                  <a href='/logout' className='nb-profile-drop__row nb-profile-drop__row--out'>
+                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <path d='M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4' />
+                      <polyline points='16 17 21 12 16 7' />
+                      <line x1='21' y1='12' x2='9' y2='12' />
+                    </svg>
+                    Logout
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
 
-                {profileOpen && (
-                  <div className="dropdown-enter absolute top-full right-0 pt-2 z-50">
-                    <div className="bg-[#0f1f17]/97 backdrop-blur-xl border border-[#86c5a2]/15 rounded-xl shadow-2xl shadow-black/70 overflow-hidden w-52">
-                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#86c5a2]/40 to-transparent" />
+        </div>
+      </header>
 
-                      {/* Profile Header */}
-                      <div className="px-4 pt-4 pb-3 border-b border-[#86c5a2]/10">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#86c5a2] to-[#4a9970] flex items-center justify-center">
-                            <User size={16} className="text-[#0a1210]" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-white">Rafsan Ahmed</p>
-                            <p className="text-xs text-[#86c5a2]">rafsan@email.com</p>
-                          </div>
-                        </div>
-                      </div>
+      {mobileOpen && <div className='nb-overlay' onClick={() => setMobileOpen(false)} />}
 
-                      {PROFILE_MENU.map((item, i) => (
+      <div className={`nb-drawer${mobileOpen ? ' nb-drawer--open' : ''}`}>
+        <div className='nb-drawer__head'>
+          <a href='/' className='nb-logo' onClick={() => setMobileOpen(false)}>
+            <span className='nb-logo__dot' />
+            <span className='nb-logo__text'>Vougely</span>
+          </a>
+          <button className='nb-drawer__close' onClick={() => setMobileOpen(false)}>
+            <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+              <line x1='18' y1='6' x2='6' y2='18' />
+              <line x1='6' y1='6' x2='18' y2='18' />
+            </svg>
+          </button>
+        </div>
+
+        <div className='nb-drawer__search'>
+          <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+            <circle cx='11' cy='11' r='8' />
+            <line x1='21' y1='21' x2='16.65' y2='16.65' />
+          </svg>
+          <input type='text' placeholder='Search…' />
+        </div>
+
+        <div className='nb-drawer__nav'>
+          {MENU.map((item) => (
+            <div key={item.label} className='nb-drawer__item'>
+              <button
+                className='nb-drawer__btn'
+                onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
+              >
+                <span className={item.label === 'Sale' ? 'nb-drawer__btn--sale' : ''}>{item.label}</span>
+                {item.columns.length > 0 && (
+                  <svg
+                    className={`nb-drawer__arrow${mobileExpanded === item.label ? ' nb-drawer__arrow--open' : ''}`}
+                    width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'
+                  >
+                    <polyline points='6 9 12 15 18 9' />
+                  </svg>
+                )}
+              </button>
+              {mobileExpanded === item.label && item.columns.length > 0 && (
+                <div className='nb-drawer__sub'>
+                  {item.columns.map((col) => (
+                    <div key={col.heading}>
+                      <p className='nb-drawer__sub-title'>{col.heading}</p>
+                      {col.links.map((link) => (
                         <a
-                          key={item.label}
-                          href={item.href}
-                          className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors duration-150 group/pm ${item.danger
-                              ? "text-[#e87b7b] hover:bg-[#e87b7b]/10 border-t border-[#86c5a2]/10 mt-1"
-                              : "text-[#a8c4b0] hover:text-white hover:bg-[#86c5a2]/10"
-                            }`}
+                          key={link}
+                          href={`/${item.label.toLowerCase()}/${link.toLowerCase().replace(/[\s&]+/g, '-')}`}
+                          className='nb-drawer__sub-link'
+                          onClick={() => setMobileOpen(false)}
                         >
-                          <span className={`transition-transform duration-150 group-hover/pm:translate-x-0.5 ${item.danger ? "text-[#e87b7b]" : "text-[#86c5a2]"}`}>
-                            {item.icon}
-                          </span>
-                          {item.label}
+                          {link}
                         </a>
                       ))}
                     </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="lg:hidden p-2.5 rounded-xl text-[#a8c4b0] hover:text-white hover:bg-white/5 transition-all duration-200 ml-1"
-              >
-                {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-
-          {/* Search Bar */}
-          {searchOpen && (
-            <div className="search-slide pb-3 overflow-hidden">
-              <div className="relative">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86c5a2]" />
-                <input
-                  type="text"
-                  autoFocus
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search pets, food, accessories..."
-                  className="w-full bg-[#0f1f17]/80 border border-[#86c5a2]/20 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-[#5a7a62] focus:outline-none focus:border-[#86c5a2]/50 focus:bg-[#0f1f17] transition-all duration-200"
-                />
-                <kbd className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-[#5a7a62] border border-[#5a7a62]/30 rounded px-1.5 py-0.5 hidden sm:block">
-                  ESC
-                </kbd>
-              </div>
-            </div>
-          )}
+          ))}
         </div>
 
-        {/* Mobile Menu */}
-        {mobileOpen && (
-          <div className="mobile-menu-enter lg:hidden bg-[#0a1610]/98 backdrop-blur-xl border-t border-[#86c5a2]/10 max-h-[80vh] overflow-y-auto">
-            <div className="px-4 py-4 space-y-1">
-              {NAV_LINKS.map((link) => (
-                <div key={link.label}>
-                  {link.dropdown ? (
-                    <>
-                      <button
-                        onClick={() => setMobileExpanded(mobileExpanded === link.label ? null : link.label)}
-                        className="w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-medium text-[#c8d9ce] hover:bg-[#86c5a2]/10 hover:text-white transition-colors duration-150"
-                      >
-                        {link.label}
-                        <ChevronDown
-                          size={14}
-                          className={`text-[#86c5a2] transition-transform duration-200 ${mobileExpanded === link.label ? "rotate-180" : ""}`}
-                        />
-                      </button>
-                      {mobileExpanded === link.label && (
-                        <div className="ml-4 mt-1 space-y-0.5 border-l border-[#86c5a2]/15 pl-3">
-                          {link.dropdown.map((item) => (
-                            <a
-                              key={item.label}
-                              href={item.href}
-                              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-[#8ab09a] hover:text-white hover:bg-[#86c5a2]/10 transition-colors duration-150"
-                            >
-                              <span className="text-[#86c5a2]">{item.icon}</span>
-                              {item.label}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <a
-                      href={link.href}
-                      className="flex items-center px-3 py-3 rounded-xl text-sm font-medium text-[#c8d9ce] hover:bg-[#86c5a2]/10 hover:text-white transition-colors duration-150"
-                    >
-                      {link.label}
-                    </a>
-                  )}
-                </div>
-              ))}
-
-              {/* Mobile Profile Section */}
-              <div className="border-t border-[#86c5a2]/10 pt-3 mt-3">
-                <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[#86c5a2]/5 mb-2">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#86c5a2] to-[#4a9970] flex items-center justify-center">
-                    <User size={16} className="text-[#0a1210]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Rafsan Ahmed</p>
-                    <p className="text-xs text-[#86c5a2]">View Profile</p>
-                  </div>
-                </div>
-                {PROFILE_MENU.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-150 ${item.danger ? "text-[#e87b7b] hover:bg-[#e87b7b]/10" : "text-[#a8c4b0] hover:text-white hover:bg-[#86c5a2]/10"
-                      }`}
-                  >
-                    <span className={item.danger ? "text-[#e87b7b]" : "text-[#86c5a2]"}>{item.icon}</span>
-                    {item.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Spacer */}
-      <div className="h-16" />
+        <div className='nb-drawer__foot'>
+          <a href='/dashboard' className='nb-drawer__foot-link nb-drawer__foot-link--dash'>Dashboard</a>
+          <a href='/orders' className='nb-drawer__foot-link'>Orders</a>
+          <a href='/wishlist' className='nb-drawer__foot-link'>Wishlist</a>
+          <a href='/logout' className='nb-drawer__foot-link nb-drawer__foot-link--out'>Logout</a>
+        </div>
+      </div>
     </>
   );
-}
+};
+
+export default Navbar;

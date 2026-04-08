@@ -6,14 +6,17 @@ import { router } from "./routes/Routes.jsx";
 import React from "react";
 import AuthProvider from "./providers/AuthProvider.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import { CartProvider } from "./context/CartContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ErrorBoundary>
       <AuthProvider>
-        <div className="bg-base-100">
-          <RouterProvider router={router} />
-        </div>
+        <CartProvider>
+          <div className="bg-base-100">
+            <RouterProvider router={router} />
+          </div>
+        </CartProvider>
       </AuthProvider>
     </ErrorBoundary>
   </React.StrictMode>

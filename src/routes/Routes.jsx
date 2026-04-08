@@ -3,10 +3,12 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import ErrorPage from "../layouts/ErrorPage";
 import Home from "../pages/Home/Home/Home";
 import DashboardLayout from "../layouts/DashboardLayout";
+import Cart from "../pages/Cart/Cart";
+import Wishlist from "../pages/Wishlist/Wishlist";
 
 import App from "../App";
-import Login from "../pages/Login/Login/Login";
-import Register from "../pages/Login/Register/Register";
+import Login from "../pages/Auth/Login/Login";
+import Register from "../pages/Auth/Register/Register";
 
 export const router = createBrowserRouter([
   {
@@ -18,14 +20,21 @@ export const router = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
-    
       {
-        path: "login",
+        path: "/cart",
+        element: <Cart />,
+      },
+      {
+        path: "/login",
         element: <Login />,
       },
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/wishlist",
+        element: <Wishlist />,
       },
 
     ],

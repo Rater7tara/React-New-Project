@@ -1,0 +1,241 @@
+:root {
+  --white:     #ffffff;
+  --gray-50:   #f7f7f5;
+  --gray-100:  #eeeeec;
+  --gray-200:  #d8d8d5;
+  --gray-400:  #9e9e9a;
+  --gray-600:  #5a5a56;
+  --gray-900:  #1c1c1a;
+  --accent:    #c17f3a;
+  --accent-lt: #f5ebe0;
+  --sans:      'Outfit', system-ui, sans-serif;
+  --serif:     'Cormorant Garamond', Georgia, serif;
+}
+
+.fc-section {
+  padding: 60px 0 50px;
+  background: var(--white);
+}
+
+.fc-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* Header */
+.fc-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 56px;
+}
+
+.fc-header__tag {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-lt);
+  padding: 6px 18px;
+  border-radius: 100px;
+  margin-bottom: 18px;
+}
+
+.fc-header__title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4.5vw, 48px);
+  font-weight: 600;
+  color: var(--gray-900);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.fc-header__title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.fc-header__sub {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--gray-600);
+  line-height: 1.7;
+}
+
+/* Grid */
+.fc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  grid-auto-rows: 380px;
+  grid-auto-flow: dense;
+}
+
+.fc-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  height: 100%;
+}
+
+.fc-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.fc-card--large {
+  grid-row: span 2;
+}
+
+.fc-card--small {
+  grid-row: span 1;
+}
+
+.fc-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.fc-card:hover .fc-card__img {
+  transform: scale(1.08);
+}
+
+.fc-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(28,28,26,0.0) 0%,
+    rgba(28,28,26,0.4) 60%,
+    rgba(28,28,26,0.8) 100%
+  );
+  transition: background 0.3s ease;
+}
+
+.fc-card:hover .fc-card__overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(28,28,26,0.1) 0%,
+    rgba(28,28,26,0.5) 60%,
+    rgba(28,28,26,0.85) 100%
+  );
+}
+
+.fc-card__content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-card__items {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+}
+
+.fc-card__name {
+  font-family: var(--serif);
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.fc-card__tagline {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 10px;
+}
+
+.fc-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fc-card:hover .fc-card__cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fc-card__cta svg {
+  transition: transform 0.25s ease;
+}
+
+.fc-card:hover .fc-card__cta svg {
+  transform: translateX(4px);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .fc-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 320px;
+  }
+
+  .fc-card--large {
+    grid-row: span 2;
+  }
+
+  .fc-card--small {
+    grid-row: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .fc-section {
+    padding: 60px 0;
+  }
+
+  .fc-container {
+    padding: 0 20px;
+  }
+
+  .fc-header {
+    margin-bottom: 40px;
+  }
+
+  .fc-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 16px;
+  }
+
+  .fc-card {
+    height: 280px;
+  }
+
+  .fc-card--large {
+    grid-row: span 1;
+    height: 320px;
+  }
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import './ErrorBoundary.css';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -7,12 +8,10 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
     console.error('Error caught by boundary:', error, errorInfo);
     this.setState({
       error: error,
@@ -22,47 +21,60 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
-            <div className="mb-4">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
+        <div className="error-boundary">
+          <div className="error-boundary__content">
+            <div className="error-boundary__icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
-            <p className="text-gray-600 mb-6">
-              An unexpected error occurred. The page may need to be refreshed.
+
+            <h2 className="error-boundary__title">Oops! Something Went Wrong</h2>
+            <p className="error-boundary__desc">
+              We encountered an unexpected error. Please try refreshing the page or return to the homepage.
             </p>
-            <div className="space-y-3">
+
+            <div className="error-boundary__actions">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors duration-200"
+                className="error-boundary__btn error-boundary__btn--primary"
               >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="23 4 23 10 17 10" />
+                  <polyline points="1 20 1 14 7 14" />
+                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
                 Reload Page
               </button>
               <button
-                onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
-                className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors duration-200"
+                onClick={() => {
+                  window.location.href = '/';
+                }}
+                className="error-boundary__btn error-boundary__btn--secondary"
               >
-                Try Again
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Go to Homepage
               </button>
             </div>
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-6 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                  Error Details (Development)
+              <details className="error-boundary__details">
+                <summary className="error-boundary__details-summary">
+                  View Error Details (Development Mode)
                 </summary>
-                <div className="mt-2 p-4 bg-gray-100 rounded text-xs text-gray-800 overflow-auto max-h-32">
-                  <p className="font-semibold mb-2">Error:</p>
-                  <pre className="whitespace-pre-wrap">{this.state.error.toString()}</pre>
+                <div className="error-boundary__details-content">
+                  <p className="error-boundary__details-label">Error:</p>
+                  <pre className="error-boundary__details-pre">{this.state.error.toString()}</pre>
                   {this.state.errorInfo && (
                     <>
-                      <p className="font-semibold mb-2 mt-4">Component Stack:</p>
-                      <pre className="whitespace-pre-wrap">{this.state.errorInfo.componentStack}</pre>
+                      <p className="error-boundary__details-label">Component Stack:</p>
+                      <pre className="error-boundary__details-pre">{this.state.errorInfo.componentStack}</pre>
                     </>
                   )}
                 </div>
