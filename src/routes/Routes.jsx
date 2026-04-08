@@ -2,13 +2,18 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 
 import ErrorPage from "../layouts/ErrorPage";
 import Home from "../pages/Home/Home/Home";
-import DashboardLayout from "../layouts/DashboardLayout";
+import DashboardLayout from "../pages/Dashboard/DashboardLayout/DashboardLayout";
 import Cart from "../pages/Cart/Cart";
 import Wishlist from "../pages/Wishlist/Wishlist";
 
 import App from "../App";
 import Login from "../pages/Auth/Login/Login";
 import Register from "../pages/Auth/Register/Register";
+import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
+import Products from "../pages/Dashboard/Products/Products";
+import Orders from "../pages/Dashboard/Orders/Orders";
+import Customers from "../pages/Dashboard/Customers/Customers";
+import Settings from "../pages/Dashboard/Settings/Settings";
 
 export const router = createBrowserRouter([
   {
@@ -43,28 +48,26 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     element: <DashboardLayout />,
     children: [
-    //   {
-    //     index: true, // Default dashboard route - NOW SHOWS ROLE-BASED DASHBOARD
-    //     element: <RoleBasedDashboard />,
-    //   },
-
-
-      // User specific routes
-
-
-      // Admin specific routes
-    //   {
-    //     path: "admin", // Keep this route for direct access if needed
-    //     element: <AdminDashboard />,
-    //   },
-
-
-      // Seller specific routes
-    //   {
-    //     path: "seller", // Keep this route for direct access if needed
-    //     element: <SellerDashboard />,
-    //   },
-  
+      {
+        index: true,
+        element: <DashboardHome />,
+      },
+      {
+        path: "products",
+        element: <Products />,
+      },
+      {
+        path: "orders",
+        element: <Orders />,
+      },
+      {
+        path: "customers",
+        element: <Customers />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
     ],
   },
  

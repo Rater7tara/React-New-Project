@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import ServerURL from "../serverConfig";
 import AuthService from "../services/AuthService";
+import toast from 'react-hot-toast';
 
 export const AuthContext = createContext(null);
 
@@ -58,9 +59,9 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
 
     try {
-      console.log("Creating user with:", { name, email, contactNumber: phone, password });
+      console.log("Creating user with:", { name, email, password });
 
-      const response = await fetch(`${BASE_URL}auth/create-user`, {
+      const response = await fetch(`${BASE_URL}auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +69,6 @@ const AuthProvider = ({ children }) => {
         body: JSON.stringify({
           name,
           email,
-          contactNumber: phone,
           password,
         }),
       });
@@ -91,6 +91,18 @@ const AuthProvider = ({ children }) => {
 
       if (!data.success) {
         console.error("API reported failure:", data.message);
+        toast.error(data.message || 'Registration failed', {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            fontFamily: "'Outfit', system-ui, sans-serif",
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px 24px',
+          },
+        });
         throw new Error(data.message || "Registration failed");
       }
 
@@ -98,6 +110,23 @@ const AuthProvider = ({ children }) => {
       // since the account needs to be verified first
       // Just return the response data including userId
       console.log("Registration successful, returning data:", data);
+
+      toast.success('Registration successful! Please login.', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#10b981',
+          color: '#fff',
+          fontFamily: "'Outfit', system-ui, sans-serif",
+          fontWeight: '500',
+          borderRadius: '12px',
+          padding: '16px 24px',
+        },
+        iconTheme: {
+          primary: '#fff',
+          secondary: '#10b981',
+        },
+      });
 
       return {
         success: true,
@@ -108,6 +137,20 @@ const AuthProvider = ({ children }) => {
       };
     } catch (error) {
       console.error("Registration error details:", error);
+      if (!error.message.includes('Registration failed')) {
+        toast.error(error.message || 'Registration failed. Please try again.', {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            fontFamily: "'Outfit', system-ui, sans-serif",
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px 24px',
+          },
+        });
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -149,6 +192,18 @@ const AuthProvider = ({ children }) => {
 
       if (!data.success) {
         console.error("API reported failure:", data.message);
+        toast.error(data.message || 'Login failed', {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            fontFamily: "'Outfit', system-ui, sans-serif",
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px 24px',
+          },
+        });
         throw new Error(data.message || "Login failed");
       }
 
@@ -178,9 +233,43 @@ const AuthProvider = ({ children }) => {
       setUser(userData);
       console.log("User data stored:", userData);
 
+      // Show success toast
+      if (!isRefresh) {
+        toast.success(`Welcome back, ${userData.name || 'User'}!`, {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            background: '#10b981',
+            color: '#fff',
+            fontFamily: "'Outfit', system-ui, sans-serif",
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px 24px',
+          },
+          iconTheme: {
+            primary: '#fff',
+            secondary: '#10b981',
+          },
+        });
+      }
+
       return userData;
     } catch (error) {
       console.error("Login error details:", error);
+      if (!isRefresh && !error.message.includes('Login failed')) {
+        toast.error(error.message || 'Login failed. Please try again.', {
+          duration: 4000,
+          position: 'top-center',
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            fontFamily: "'Outfit', system-ui, sans-serif",
+            fontWeight: '500',
+            borderRadius: '12px',
+            padding: '16px 24px',
+          },
+        });
+      }
       throw error;
     } finally {
       if (!isRefresh) {
@@ -193,11 +282,24 @@ const AuthProvider = ({ children }) => {
   const logOut = () => {
     // Use the AuthService to properly clean up all storage
     AuthService.logout();
-    
+
     // Clear user state
     setUser(null);
     setAuthToken(null);
-    
+
+    toast.success('Logged out successfully', {
+      duration: 2000,
+      position: 'top-center',
+      style: {
+        background: '#64748b',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '16px 24px',
+      },
+    });
+
     console.log("Logged out and cleared all user data");
     return true;
   };

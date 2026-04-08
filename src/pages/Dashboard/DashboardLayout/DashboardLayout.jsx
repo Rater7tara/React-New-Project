@@ -56,18 +56,6 @@ const MENU_ITEMS = [
     ),
   },
   {
-    id: 'analytics',
-    label: 'Analytics',
-    path: '/dashboard/analytics',
-    icon: (
-      <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-        <line x1='18' y1='20' x2='18' y2='10' />
-        <line x1='12' y1='20' x2='12' y2='4' />
-        <line x1='6' y1='20' x2='6' y2='14' />
-      </svg>
-    ),
-  },
-  {
     id: 'settings',
     label: 'Settings',
     path: '/dashboard/settings',
@@ -99,7 +87,7 @@ const DashboardLayout = () => {
         <div className='dashboard-sidebar__header'>
           <Link to='/' className='dashboard-logo'>
             <span className='dashboard-logo__dot' />
-            <span className='dashboard-logo__text'>Vougely</span>
+            <span className='dashboard-logo__text'>GlowBerry</span>
           </Link>
           <button
             className='dashboard-sidebar__toggle'

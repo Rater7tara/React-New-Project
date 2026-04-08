@@ -7,6 +7,7 @@ import React from "react";
 import AuthProvider from "./providers/AuthProvider.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
+import { Toaster } from 'react-hot-toast';
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <CartProvider>
           <div className="bg-base-100">
+            <Toaster />
             <RouterProvider router={router} />
           </div>
         </CartProvider>

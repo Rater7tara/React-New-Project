@@ -1,31 +1,17 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import './Login.css';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../../providers/AuthProvider';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const { signIn } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      await signIn(email, password);
-      // Redirect to home or dashboard after successful login
-      navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Handle login logic here
+    console.log('Login:', { email, password, rememberMe });
   };
 
   return (
@@ -127,8 +113,8 @@ const Login = () => {
                 <Link to='/forgot-password' className='auth-forgot'>Forgot password?</Link>
               </div>
 
-              <button type='submit' className='auth-submit' disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
+              <button type='submit' className='auth-submit'>
+                Sign In
               </button>
 
               <div className='auth-divider'>

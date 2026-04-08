@@ -247,13 +247,14 @@
 .auth-checkbox__mark {
   width: 18px;
   height: 18px;
-  border: 1.5px solid var(--gray-300);
+  border: 1.5px solid var(--gray-400);
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  background: var(--white);
 }
 
 .auth-checkbox input:checked + .auth-checkbox__mark {

@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import '../Login/Login.css'; // Reuse the same styles
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../providers/AuthProvider';
+import toast from 'react-hot-toast';
 
 const Register = () => {
+  const { createUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,17 +22,51 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+          fontFamily: "'Outfit', system-ui, sans-serif",
+          fontWeight: '500',
+          borderRadius: '12px',
+          padding: '16px 24px',
+        },
+      });
       return;
     }
+
     if (!agreeTerms) {
-      alert('Please agree to the terms and conditions');
+      toast.error('Please agree to the terms and conditions', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+          fontFamily: "'Outfit', system-ui, sans-serif",
+          fontWeight: '500',
+          borderRadius: '12px',
+          padding: '16px 24px',
+        },
+      });
       return;
     }
-    console.log('Register:', formData);
+
+    setLoading(true);
+
+    try {
+      await createUser(formData.name, formData.email, null, formData.password);
+      navigate('/login');
+    } catch (error) {
+      console.error('Registration failed:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,9 +82,9 @@ const Register = () => {
           <div className='auth-visual__content'>
             <Link to='/' className='auth-logo'>
               <span className='auth-logo__dot' />
-              <span className='auth-logo__text'>Vougely</span>
+              <span className='auth-logo__text'>GlowBerry</span>
             </Link>
-            <h2 className='auth-visual__title'>Join Vougely</h2>
+            <h2 className='auth-visual__title'>Join GlowBerry</h2>
             <p className='auth-visual__desc'>
               Create your account and discover curated fashion for every occasion
             </p>
@@ -186,8 +225,8 @@ const Register = () => {
                 </span>
               </label>
 
-              <button type='submit' className='auth-submit'>
-                Create Account
+              <button type='submit' className='auth-submit' disabled={loading}>
+                {loading ? 'Creating Account...' : 'Create Account'}
               </button>
 
               <div className='auth-divider'>

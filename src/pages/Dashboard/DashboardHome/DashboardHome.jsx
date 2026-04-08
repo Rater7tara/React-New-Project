@@ -165,43 +165,6 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className='dash-actions'>
-        <Link to='/dashboard/products' className='dash-action-card'>
-          <div className='dash-action-card__icon'>
-            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-              <path d='M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z' />
-              <line x1='3' y1='6' x2='21' y2='6' />
-              <path d='M16 10a4 4 0 01-8 0' />
-            </svg>
-          </div>
-          <h3 className='dash-action-card__title'>Manage Products</h3>
-          <p className='dash-action-card__desc'>Add, edit or remove products from your inventory</p>
-        </Link>
-
-        <Link to='/dashboard/orders' className='dash-action-card'>
-          <div className='dash-action-card__icon'>
-            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-              <path d='M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z' />
-              <polyline points='14 2 14 8 20 8' />
-            </svg>
-          </div>
-          <h3 className='dash-action-card__title'>View Orders</h3>
-          <p className='dash-action-card__desc'>Track and manage all customer orders</p>
-        </Link>
-
-        <Link to='/dashboard/analytics' className='dash-action-card'>
-          <div className='dash-action-card__icon'>
-            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-              <line x1='18' y1='20' x2='18' y2='10' />
-              <line x1='12' y1='20' x2='12' y2='4' />
-              <line x1='6' y1='20' x2='6' y2='14' />
-            </svg>
-          </div>
-          <h3 className='dash-action-card__title'>Analytics</h3>
-          <p className='dash-action-card__desc'>View detailed insights and reports</p>
-        </Link>
-      </div>
     </div>
   );
 };

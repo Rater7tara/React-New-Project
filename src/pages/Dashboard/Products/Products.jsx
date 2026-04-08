@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Products.css';
+import ProductForm from '../ProductForm/ProductForm';
 
 // Mock product data
 const MOCK_PRODUCTS = [
@@ -86,6 +87,8 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+  const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   // Filter products
   const filteredProducts = products.filter((product) => {
@@ -102,13 +105,35 @@ const Products = () => {
   };
 
   const handleEdit = (id) => {
-    // This will be handled by the Edit Product form component
-    console.log('Edit product:', id);
+    const product = products.find((p) => p.id === id);
+    setEditingProduct(product);
+    setShowForm(true);
   };
 
   const handleAddNew = () => {
-    // This will be handled by the Add Product form component
-    console.log('Add new product');
+    setEditingProduct(null);
+    setShowForm(true);
+  };
+
+  const handleFormSubmit = (formData) => {
+    if (editingProduct) {
+      // Update existing product
+      setProducts(products.map((p) => (p.id === editingProduct.id ? { ...p, ...formData } : p)));
+    } else {
+      // Add new product
+      const newProduct = {
+        id: Math.max(...products.map((p) => p.id)) + 1,
+        ...formData,
+      };
+      setProducts([...products, newProduct]);
+    }
+    setShowForm(false);
+    setEditingProduct(null);
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setEditingProduct(null);
   };
 
   return (
@@ -311,6 +336,15 @@ const Products = () => {
           <h3 className='products-empty__title'>No products found</h3>
           <p className='products-empty__desc'>Try adjusting your filters or search term</p>
         </div>
+      )}
+
+      {/* Product Form Modal */}
+      {showForm && (
+        <ProductForm
+          product={editingProduct}
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
+        />
       )}
     </div>
   );
