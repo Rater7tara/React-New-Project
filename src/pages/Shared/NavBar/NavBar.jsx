@@ -101,7 +101,7 @@ const Navbar = () => {
 
           <a href='/' className='nb-logo'>
             <span className='nb-logo__dot' />
-            <span className='nb-logo__text'>Vougely</span>
+            <span className='nb-logo__text'>GlowBerry</span>
           </a>
 
           <nav className='nb-nav' onMouseLeave={onLeave}>
@@ -256,7 +256,7 @@ const Navbar = () => {
         <div className='nb-drawer__head'>
           <a href='/' className='nb-logo' onClick={() => setMobileOpen(false)}>
             <span className='nb-logo__dot' />
-            <span className='nb-logo__text'>Vougely</span>
+            <span className='nb-logo__text'>GlowBerry</span>
           </a>
           <button className='nb-drawer__close' onClick={() => setMobileOpen(false)}>
             <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>

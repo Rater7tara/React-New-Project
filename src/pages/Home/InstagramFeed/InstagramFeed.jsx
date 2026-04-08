@@ -47,7 +47,7 @@ const InstagramFeed = () => {
             </svg>
           </div>
           <h2 className='ig-header__title'>
-            Follow Us <em>@Vougely</em>
+            Follow Us <em>@GlowBerry</em>
           </h2>
           <p className='ig-header__desc'>
             Get inspired by our community — tag us to be featured
@@ -82,7 +82,7 @@ const InstagramFeed = () => {
             <circle cx='12' cy='12' r='4' />
             <circle cx='17.5' cy='6.5' r='1' fill='currentColor' stroke='none' />
           </svg>
-          Follow @Vougely on Instagram
+          Follow @GlowBerry on Instagram
         </a>
       </div>
     </section>

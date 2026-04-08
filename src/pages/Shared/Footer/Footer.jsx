@@ -153,7 +153,7 @@ const Footer = () => {
         <div className='ft-brand'>
           <a href='/' className='ft-brand__logo'>
             <span className='ft-brand__dot' />
-            <span className='ft-brand__name'>Vougely</span>
+            <span className='ft-brand__name'>GlowBerry</span>
           </a>
           <p className='ft-brand__tagline'>
             Contemporary fashion for the whole family — curated with care, delivered to your door.
@@ -202,7 +202,7 @@ const Footer = () => {
       </div>
 
       <div className='ft-bottom'>
-        <p className='ft-bottom__copy'>© {new Date().getFullYear()} Vougely. All rights reserved.</p>
+        <p className='ft-bottom__copy'>© {new Date().getFullYear()} GlowBerry. All rights reserved.</p>
         <div className='ft-payments'>
           <span className='ft-payments__label'>We Accept:</span>
           {PAYMENTS.map((p) => (
