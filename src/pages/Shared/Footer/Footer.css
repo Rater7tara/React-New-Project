@@ -271,15 +271,38 @@
   justify-content: center;
   transition: all 0.25s ease;
   cursor: pointer;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 4px 6px;
+  height: 30px;
+  min-width: 46px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .ft-payment:hover {
   transform: translateY(-2px);
-  filter: brightness(1.1);
+  filter: brightness(1.05);
 }
 
 .ft-payment svg {
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
+
+.ft-payment__img {
+  display: block;
+  height: 22px;
+  width: auto;
+  max-width: 60px;
+  object-fit: contain;
+}
+
+.ft-payment__label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.02em;
+  padding: 0 4px;
 }
 
 /* Legal */

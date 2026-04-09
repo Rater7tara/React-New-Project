@@ -1,101 +1,34 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import NavBar from '../src/pages/Shared/NavBar/NavBar';
 import { Outlet, useLocation } from 'react-router-dom';
 import Footer from '../src/pages/Shared/Footer/Footer';
 import { AuthContext } from '../src/providers/AuthProvider';
-import serverURL from '../src/serverConfig';
+import ScrollToTop from './components/ScrollToTop';
 
-const calculateProfileCompletion = (profile) => {
-    let completed = 0;
-    const total = 5;
-    if (profile?.name) completed++;
-    if (profile?.email) completed++;
-    if (profile?.contactNumber || profile?.phone) completed++;
-    if (profile?.address) completed++;
-    if (profile?.profileImg && !profile.profileImg.includes('res.cloudinary.com/demo')) completed++;
-    return Math.round((completed / total) * 100);
-};
+// Paths where the main navbar and footer should be hidden
+const HIDDEN_CHROME_PATHS = ['/login', '/register'];
 
 const App = () => {
-    const { user } = useContext(AuthContext);
+    const { user, refreshProfile } = useContext(AuthContext);
     const location = useLocation();
-    const [profileData, setProfileData] = useState(null);
-    const [showProfilePopup, setShowProfilePopup] = useState(false);
+
+    const hideChrome = HIDDEN_CHROME_PATHS.some(
+        (p) => location.pathname === p || location.pathname.startsWith(`${p}/`)
+    );
 
     useEffect(() => {
-        if (!user) {
-            setProfileData(null);
-            setShowProfilePopup(false);
-            return;
+        if (user && typeof refreshProfile === 'function') {
+            refreshProfile().catch(() => {});
         }
-
-        // Only fetch and show popup on the home page ('/')
-        if (location.pathname !== '/') {
-            setShowProfilePopup(false);
-            return;
-        }
-
-        const abortController = new AbortController();
-
-        const fetchProfile = async () => {
-            try {
-                const token = localStorage.getItem('auth-token');
-                if (!token) return;
-
-                const response = await fetch(`${serverURL.url}auth/profile`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    signal: abortController.signal
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result?.success && result?.data) {
-                        const fetched = result.data;
-                        setProfileData(fetched);
-
-                        const completion = calculateProfileCompletion(fetched);
-                        if (completion < 100) {
-                            setShowProfilePopup(true);
-                        }
-                    }
-                }
-            } catch (error) {
-                if (error.name !== 'AbortError') {
-                    console.error('Error fetching profile:', error);
-                }
-            }
-        };
-
-        fetchProfile();
-
-        return () => {
-            abortController.abort();
-        };
-    }, [user, location.pathname]);
-
-    const handleDismissPopup = () => {
-        setShowProfilePopup(false);
-    };
-
-    const userRole = user?.role === 'user' ? 'buyer' : (user?.role || 'buyer');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?._id]);
 
     return (
         <div>
-            <NavBar/>
-            <Outlet/>
-            <Footer/>
-
-            {showProfilePopup && profileData && (
-                <ProfileCompletionPopup
-                    profileData={profileData}
-                    userRole={userRole}
-                    onDismiss={handleDismissPopup}
-                />
-            )}
+            <ScrollToTop />
+            {!hideChrome && <NavBar />}
+            <Outlet />
+            {!hideChrome && <Footer />}
         </div>
     );
 };

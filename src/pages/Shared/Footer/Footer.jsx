@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 import './Footer.css';
+import cod from '../../../assets/payment/cod.png';
+import visa from '../../../assets/payment/visa.png';
+import card from '../../../assets/payment/card.png';
+import nagad from '../../../assets/payment/nagad.png';
+import bkash from '../../../assets/payment/bkash.png';
+import rocket from '../../../assets/payment/rocket.png';
+import mastercard from '../../../assets/payment/mastercard.png';
 
 const LINKS = [
   {
@@ -76,64 +83,29 @@ const SOCIALS = [
   },
 ];
 
+// Payment method icon images — loaded from src/assets/payment/
+// Supported files: visa, mastercard, bkash, nagad, rocket, cod (png/jpg/svg/webp)
+// Vite's import.meta.glob will eager-load whatever images you put in that folder.
+const paymentImages = import.meta.glob(
+  '../../../assets/payment/*.{png,jpg,jpeg,svg,webp}',
+  { eager: true, import: 'default' }
+);
+
+const resolvePaymentImage = (key) => {
+  const entry = Object.entries(paymentImages).find(([path]) =>
+    path.toLowerCase().includes(`/${key.toLowerCase()}.`)
+  );
+  return entry ? entry[1] : null;
+};
+
 const PAYMENTS = [
-  {
-    name: 'Visa',
-    icon: (
-      <svg width='40' height='26' viewBox='0 0 48 32' fill='none'>
-        <rect width='48' height='32' rx='4' fill='#1434CB'/>
-        <path d='M18.5 10.5h-3.2l-2 11h2.4l2-11zm7.6 7.1l1.3-3.6.7 3.6h-2zm2.7 3.9h2.2l-1.9-11h-2c-.5 0-.9.3-1 .7l-3.6 10.3h2.5l.5-1.4h3.1l.2 1.4zm-7-3.6c0-2.9-4-3.1-4-4.4 0-.4.4-.8 1.2-.9.4 0 1.5-.1 2.8.5l.5-2.3c-.7-.3-1.6-.5-2.7-.5-2.5 0-4.3 1.3-4.3 3.2 0 1.4 1.2 2.2 2.2 2.6 1 .5 1.3.8 1.3 1.2 0 .6-.7 1-1.4 1-.9 0-1.7-.2-2.5-.5l-.5 2.4c.8.3 2 .6 3.2.6 2.7 0 4.5-1.3 4.5-3.3z' fill='white'/>
-      </svg>
-    ),
-  },
-  {
-    name: 'Mastercard',
-    icon: (
-      <svg width='40' height='26' viewBox='0 0 48 32' fill='none'>
-        <rect width='48' height='32' rx='4' fill='#252525'/>
-        <circle cx='18' cy='16' r='7' fill='#EB001B'/>
-        <circle cx='30' cy='16' r='7' fill='#F79E1B'/>
-        <path d='M24 10.5c-1.5 1.3-2.5 3.3-2.5 5.5s1 4.2 2.5 5.5c1.5-1.3 2.5-3.3 2.5-5.5s-1-4.2-2.5-5.5z' fill='#FF5F00'/>
-      </svg>
-    ),
-  },
-  {
-    name: 'bKash',
-    icon: (
-      <svg width='40' height='26' viewBox='0 0 48 32' fill='none'>
-        <rect width='48' height='32' rx='4' fill='#E2136E'/>
-        <text x='24' y='20' fontFamily='Arial' fontSize='11' fontWeight='bold' fill='white' textAnchor='middle'>bKash</text>
-      </svg>
-    ),
-  },
-  {
-    name: 'Nagad',
-    icon: (
-      <svg width='40' height='26' viewBox='0 0 48 32' fill='none'>
-        <rect width='48' height='32' rx='4' fill='#EE3124'/>
-        <text x='24' y='20' fontFamily='Arial' fontSize='10' fontWeight='bold' fill='white' textAnchor='middle'>NAGAD</text>
-      </svg>
-    ),
-  },
-  {
-    name: 'Rocket',
-    icon: (
-      <svg width='40' height='26' viewBox='0 0 48 32' fill='none'>
-        <rect width='48' height='32' rx='4' fill='#8862A8'/>
-        <text x='24' y='20' fontFamily='Arial' fontSize='10' fontWeight='bold' fill='white' textAnchor='middle'>Rocket</text>
-      </svg>
-    ),
-  },
-  {
-    name: 'COD',
-    icon: (
-      <svg width='40' height='26' viewBox='0 0 48 32' fill='none'>
-        <rect width='48' height='32' rx='4' fill='#2D3436'/>
-        <text x='24' y='20' fontFamily='Arial' fontSize='10' fontWeight='bold' fill='white' textAnchor='middle'>COD</text>
-      </svg>
-    ),
-  },
-];
+  { name: 'Visa', key: 'visa' },
+  { name: 'Mastercard', key: 'mastercard' },
+  { name: 'bKash', key: 'bkash' },
+  { name: 'Nagad', key: 'nagad' },
+  { name: 'Rocket', key: 'rocket' },
+  { name: 'COD', key: 'cod' },
+].map((p) => ({ ...p, src: resolvePaymentImage(p.key) }));
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -207,7 +179,16 @@ const Footer = () => {
           <span className='ft-payments__label'>We Accept:</span>
           {PAYMENTS.map((p) => (
             <div key={p.name} className='ft-payment' title={p.name}>
-              {p.icon}
+              {p.src ? (
+                <img
+                  src={p.src}
+                  alt={p.name}
+                  className='ft-payment__img'
+                  loading='lazy'
+                />
+              ) : (
+                <span className='ft-payment__label'>{p.name}</span>
+              )}
             </div>
           ))}
         </div>

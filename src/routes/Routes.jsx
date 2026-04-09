@@ -16,12 +16,6 @@ import Users from "../pages/Dashboard/Users/Users";
 import Settings from "../pages/Dashboard/Settings/Settings";
 import PrivateRoute from "./PrivateRoute";
 
-// import CustomerLayout from "../pages/CustomerDashboard/CustomerLayout/CustomerLayout";
-// import MyProfile from "../pages/CustomerDashboard/MyProfile/MyProfile";
-// import MyOrders from "../pages/CustomerDashboard/MyOrders/MyOrders";
-// import OrderDetails from "../pages/CustomerDashboard/OrderDetails/OrderDetails";
-// import MyWishlist from "../pages/CustomerDashboard/MyWishlist/MyWishlist";
-
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -79,37 +73,6 @@ export const router = createBrowserRouter([
         path: "settings",
         element: <Settings />,
       },
-    ],
-  },
-  {
-    path: "/my-account",
-    element: (
-      <PrivateRoute allowedRoles={["customer", "user"]}>
-        {/* <CustomerLayout /> */}
-      </PrivateRoute>
-    ),
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        // element: <MyProfile />,
-      },
-      // {
-      //   path: "profile",
-      //   element: <MyProfile />,
-      // },
-      // {
-      //   path: "orders",
-      //   element: <MyOrders />,
-      // },
-      // {
-      //   path: "orders/:id",
-      //   element: <OrderDetails />,
-      // },
-      // {
-      //   path: "wishlist",
-      //   element: <MyWishlist />,
-      // },
     ],
   },
 ]);
