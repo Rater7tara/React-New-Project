@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import './Products.css';
 import ProductForm from '../ProductForm/ProductForm';
+import { successToast } from '../../../utils/toastStyles';
 
 // Mock product data
 const MOCK_PRODUCTS = [
@@ -89,6 +91,7 @@ const Products = () => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   // Filter products
   const filteredProducts = products.filter((product) => {
@@ -99,10 +102,21 @@ const Products = () => {
   });
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(products.filter((p) => p.id !== id));
-    }
+    const product = products.find((p) => p.id === id);
+    if (product) setDeleteTarget(product);
   };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+    toast.success(
+      `"${deleteTarget.name}" removed successfully`,
+      successToast
+    );
+    setDeleteTarget(null);
+  };
+
+  const cancelDelete = () => setDeleteTarget(null);
 
   const handleEdit = (id) => {
     const product = products.find((p) => p.id === id);
@@ -119,6 +133,7 @@ const Products = () => {
     if (editingProduct) {
       // Update existing product
       setProducts(products.map((p) => (p.id === editingProduct.id ? { ...p, ...formData } : p)));
+      toast.success('Product updated successfully', successToast);
     } else {
       // Add new product
       const newProduct = {
@@ -126,6 +141,7 @@ const Products = () => {
         ...formData,
       };
       setProducts([...products, newProduct]);
+      toast.success('Product added successfully', successToast);
     }
     setShowForm(false);
     setEditingProduct(null);
@@ -345,6 +361,58 @@ const Products = () => {
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div
+          className='fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease]'
+          onClick={cancelDelete}
+        >
+          <div
+            className='w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='p-6 text-center'>
+              <div className='mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-red-100 mb-4'>
+                <svg width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='#ef4444' strokeWidth='2'>
+                  <polyline points='3 6 5 6 21 6' />
+                  <path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' />
+                  <line x1='10' y1='11' x2='10' y2='17' />
+                  <line x1='14' y1='11' x2='14' y2='17' />
+                </svg>
+              </div>
+              <h3 className="font-['Cormorant_Garamond',Georgia,serif] text-2xl font-semibold text-[#1c1c1a] mb-2">
+                Delete Product?
+              </h3>
+              <p className="font-['Outfit',system-ui,sans-serif] text-sm text-[#5a5a56] mb-1">
+                Are you sure you want to delete
+              </p>
+              <p className="font-['Outfit',system-ui,sans-serif] text-base font-semibold text-[#1c1c1a] mb-6">
+                "{deleteTarget.name}"?
+              </p>
+              <p className="font-['Outfit',system-ui,sans-serif] text-xs text-[#9e9e9a] mb-6">
+                This action cannot be undone.
+              </p>
+              <div className='flex gap-3'>
+                <button
+                  type='button'
+                  onClick={cancelDelete}
+                  className="flex-1 font-['Outfit',system-ui,sans-serif] text-sm font-semibold text-[#5a5a56] bg-[#f7f7f5] hover:bg-[#eeeeec] border-0 py-3 rounded-lg cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type='button'
+                  onClick={confirmDelete}
+                  className="flex-1 font-['Outfit',system-ui,sans-serif] text-sm font-semibold text-white bg-red-500 hover:bg-red-600 border-0 py-3 rounded-lg cursor-pointer transition-colors shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
