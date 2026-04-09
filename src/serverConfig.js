@@ -1,5 +1,5 @@
 const serverURL = {
-    url: `https://single-vendor-e-commerce-server.vercel.app/api/v1/`,
+    url: `https://single-vendor-e-commerce-server.vercel.app/api/`,
 };
 
 export default serverURL;

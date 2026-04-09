@@ -2,17 +2,47 @@ import React from 'react';
 import './Wishlist.css';
 import { useCart } from '../../context/CartContext';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Wishlist = () => {
   const { wishlist, removeFromWishlist, addToCart } = useCart();
 
   const handleAddToCart = (item) => {
     addToCart(item);
-    alert(`${item.name} added to cart!`);
+    toast.success(`${item.name} added to cart!`, {
+      icon: '🛒',
+      duration: 2500,
+      position: 'bottom-right',
+      style: {
+        background: '#1a1a2e',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      },
+    });
   };
 
   const handleRemove = (itemId) => {
     removeFromWishlist(itemId);
+    toast('Removed from wishlist', {
+      icon: '🗑️',
+      duration: 2000,
+      position: 'bottom-right',
+      style: {
+        background: '#1a1a2e',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      },
+    });
   };
 
   if (wishlist.length === 0) {

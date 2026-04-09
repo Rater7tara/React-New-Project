@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './DashboardLayout.css';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../providers/AuthProvider';
 
 const MENU_ITEMS = [
   {
@@ -43,9 +44,9 @@ const MENU_ITEMS = [
     ),
   },
   {
-    id: 'customers',
-    label: 'Customers',
-    path: '/dashboard/customers',
+    id: 'users',
+    label: 'Users',
+    path: '/dashboard/users',
     icon: (
       <svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
         <path d='M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2' />
@@ -72,6 +73,19 @@ const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logOut } = useContext(AuthContext);
+
+  const displayName = user?.name || 'Admin User';
+  const displayRole = user?.role
+    ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+    : 'Administrator';
+  const initial = displayName.charAt(0).toUpperCase() || 'A';
+
+  const handleLogout = () => {
+    logOut();
+    navigate('/');
+  };
 
   const isActive = (path) => {
     if (path === '/dashboard') {
@@ -116,12 +130,24 @@ const DashboardLayout = () => {
 
         <div className='dashboard-sidebar__footer'>
           <div className='dashboard-user'>
-            <div className='dashboard-user__avatar'>A</div>
+            <div className='dashboard-user__avatar'>{initial}</div>
             <div className='dashboard-user__info'>
-              <p className='dashboard-user__name'>Admin User</p>
-              <p className='dashboard-user__role'>Administrator</p>
+              <p className='dashboard-user__name'>{displayName}</p>
+              <p className='dashboard-user__role'>{displayRole}</p>
             </div>
           </div>
+          <button
+            type='button'
+            className='dashboard-logout'
+            onClick={handleLogout}
+          >
+            <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+              <path d='M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4' />
+              <polyline points='16 17 21 12 16 7' />
+              <line x1='21' y1='12' x2='9' y2='12' />
+            </svg>
+            Logout
+          </button>
         </div>
       </aside>
 
@@ -162,8 +188,33 @@ const DashboardLayout = () => {
                 className='dashboard-topbar__profile-btn'
                 onClick={() => setProfileOpen(!profileOpen)}
               >
-                <div className='dashboard-topbar__avatar'>A</div>
+                <div className='dashboard-topbar__avatar'>{initial}</div>
               </button>
+              {profileOpen && (
+                <div className='dashboard-profile-drop'>
+                  <div className='dashboard-profile-drop__header'>
+                    <p className='dashboard-profile-drop__name'>{displayName}</p>
+                    <p className='dashboard-profile-drop__email'>{user?.email}</p>
+                  </div>
+                  <Link
+                    to='/'
+                    className='dashboard-profile-drop__row'
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    Go to Home
+                  </Link>
+                  <button
+                    type='button'
+                    className='dashboard-profile-drop__row dashboard-profile-drop__row--danger'
+                    onClick={() => {
+                      setProfileOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

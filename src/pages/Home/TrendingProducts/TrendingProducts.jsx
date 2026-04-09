@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './TrendingProducts.css';
 import { useCart } from '../../../context/CartContext';
 import ProductQuickView from '../../../components/ProductQuickView/ProductQuickView';
+import toast from 'react-hot-toast';
 
 const PRODUCTS = [
   {
@@ -98,12 +99,41 @@ const TrendingProducts = () => {
 
   const handleAddToCart = (product) => {
     addToCart(product);
-    alert(`${product.name} added to cart!`);
+    toast.success(`${product.name} added to cart!`, {
+      icon: '🛒',
+      duration: 2500,
+      position: 'bottom-right',
+      style: {
+        background: '#1a1a2e',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      },
+    });
   };
 
   const handleWishlist = (product) => {
+    if (isInWishlist(product.id)) return;
     addToWishlist(product);
-    alert(`${product.name} added to wishlist!`);
+    toast.success(`${product.name} added to wishlist!`, {
+      icon: '❤️',
+      duration: 2500,
+      position: 'bottom-right',
+      style: {
+        background: '#1a1a2e',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      },
+    });
   };
 
   return (

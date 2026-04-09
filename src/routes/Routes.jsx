@@ -1,4 +1,4 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import ErrorPage from "../layouts/ErrorPage";
 import Home from "../pages/Home/Home/Home";
@@ -12,8 +12,15 @@ import Register from "../pages/Auth/Register/Register";
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
 import Products from "../pages/Dashboard/Products/Products";
 import Orders from "../pages/Dashboard/Orders/Orders";
-import Customers from "../pages/Dashboard/Customers/Customers";
+import Users from "../pages/Dashboard/Users/Users";
 import Settings from "../pages/Dashboard/Settings/Settings";
+import PrivateRoute from "./PrivateRoute";
+
+// import CustomerLayout from "../pages/CustomerDashboard/CustomerLayout/CustomerLayout";
+// import MyProfile from "../pages/CustomerDashboard/MyProfile/MyProfile";
+// import MyOrders from "../pages/CustomerDashboard/MyOrders/MyOrders";
+// import OrderDetails from "../pages/CustomerDashboard/OrderDetails/OrderDetails";
+// import MyWishlist from "../pages/CustomerDashboard/MyWishlist/MyWishlist";
 
 export const router = createBrowserRouter([
   {
@@ -41,12 +48,16 @@ export const router = createBrowserRouter([
         path: "/wishlist",
         element: <Wishlist />,
       },
-
     ],
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <PrivateRoute allowedRoles={["admin"]}>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -61,8 +72,8 @@ export const router = createBrowserRouter([
         element: <Orders />,
       },
       {
-        path: "customers",
-        element: <Customers />,
+        path: "users",
+        element: <Users />,
       },
       {
         path: "settings",
@@ -70,5 +81,35 @@ export const router = createBrowserRouter([
       },
     ],
   },
- 
+  {
+    path: "/my-account",
+    element: (
+      <PrivateRoute allowedRoles={["customer", "user"]}>
+        {/* <CustomerLayout /> */}
+      </PrivateRoute>
+    ),
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        // element: <MyProfile />,
+      },
+      // {
+      //   path: "profile",
+      //   element: <MyProfile />,
+      // },
+      // {
+      //   path: "orders",
+      //   element: <MyOrders />,
+      // },
+      // {
+      //   path: "orders/:id",
+      //   element: <OrderDetails />,
+      // },
+      // {
+      //   path: "wishlist",
+      //   element: <MyWishlist />,
+      // },
+    ],
+  },
 ]);

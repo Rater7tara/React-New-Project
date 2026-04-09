@@ -1,12 +1,15 @@
 import React, { createContext, useEffect, useState } from "react";
 import ServerURL from "../serverConfig";
 import AuthService from "../services/AuthService";
+import userService from "../services/userService";
 import toast from 'react-hot-toast';
 
 export const AuthContext = createContext(null);
 
 // Base URL for API calls
 const BASE_URL = ServerURL.url;
+
+const DEFAULT_ADMIN_EMAIL = 'nowshinakteremu005@gmail.com';
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -28,6 +31,43 @@ const AuthProvider = ({ children }) => {
 
     setLoading(false);
   }, []);
+
+  // Refresh profile from backend (GET user/profile)
+  const refreshProfile = async () => {
+    try {
+      const res = await userService.getMyProfile();
+      const payload = res?.data;
+      const fresh =
+        payload?.data?.user ||
+        payload?.data ||
+        payload?.user ||
+        payload;
+      if (fresh && typeof fresh === 'object') {
+        setUser(fresh);
+        localStorage.setItem('user-info', JSON.stringify(fresh));
+        return fresh;
+      }
+    } catch (e) {
+      console.error('refreshProfile failed:', e);
+    }
+    return null;
+  };
+
+  // Auto-promote the default admin email if backend role is not 'admin'
+  const ensureAdminRole = async (u) => {
+    if (!u) return u;
+    const userId = u._id || u.id;
+    if (u.email === DEFAULT_ADMIN_EMAIL && u.role !== 'admin' && userId) {
+      try {
+        await userService.updateUserRole(userId, 'admin');
+        const fresh = await refreshProfile();
+        return fresh || u;
+      } catch (e) {
+        console.error('auto-promote default admin failed:', e);
+      }
+    }
+    return u;
+  };
 
   // Refresh token function
   const refreshToken = async () => {
@@ -69,6 +109,7 @@ const AuthProvider = ({ children }) => {
         body: JSON.stringify({
           name,
           email,
+          phone,
           password,
         }),
       });
@@ -233,6 +274,14 @@ const AuthProvider = ({ children }) => {
       setUser(userData);
       console.log("User data stored:", userData);
 
+      // Auto-promote default admin + refresh profile to get latest role/data
+      try {
+        await ensureAdminRole(userData);
+        await refreshProfile();
+      } catch (promoteErr) {
+        console.error("Post-login profile sync failed:", promoteErr);
+      }
+
       // Show success toast
       if (!isRefresh) {
         toast.success(`Welcome back, ${userData.name || 'User'}!`, {
@@ -313,6 +362,7 @@ const AuthProvider = ({ children }) => {
     signIn,
     logOut,
     refreshToken,
+    refreshProfile,
   };
 
   return (

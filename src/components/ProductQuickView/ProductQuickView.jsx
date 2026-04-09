@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './ProductQuickView.css';
 import { useCart } from '../../context/CartContext';
+import toast from 'react-hot-toast';
 
 const ProductQuickView = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
@@ -11,13 +12,41 @@ const ProductQuickView = ({ product, onClose }) => {
 
   const handleAddToCart = () => {
     addToCart({ ...product, size: selectedSize }, quantity);
-    // Show success message (you can add toast notification here)
-    alert(`Added ${product.name} to cart!`);
+    toast.success(`${product.name} added to cart!`, {
+      icon: '🛒',
+      duration: 2500,
+      position: 'bottom-right',
+      style: {
+        background: '#1a1a2e',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      },
+    });
   };
 
   const handleWishlist = () => {
+    if (isInWishlist(product.id)) return;
     addToWishlist(product);
-    alert(`Added ${product.name} to wishlist!`);
+    toast.success(`${product.name} added to wishlist!`, {
+      icon: '❤️',
+      duration: 2500,
+      position: 'bottom-right',
+      style: {
+        background: '#1a1a2e',
+        color: '#fff',
+        fontFamily: "'Outfit', system-ui, sans-serif",
+        fontWeight: '500',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      },
+    });
   };
 
   if (!product) return null;

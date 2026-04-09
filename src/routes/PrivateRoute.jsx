@@ -21,9 +21,9 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
     
-    // If roles are specified and user's role is not included, redirect to dashboard
+    // If roles are specified and user's role is not included, redirect to home
     if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-        return <Navigate to="/dashboard" replace />;
+        return <Navigate to="/" replace />;
     }
     
     // User is authenticated and authorized, render the children

@@ -394,3 +394,105 @@
     padding: 20px 16px;
   }
 }
+
+/* Logout button in sidebar footer */
+.dashboard-logout {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dashboard-logout:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+/* Profile dropdown in topbar */
+.dashboard-topbar__profile {
+  position: relative;
+}
+
+.dashboard-profile-drop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 1001;
+  animation: dashboard-profile-drop-in 0.15s ease-out;
+}
+
+@keyframes dashboard-profile-drop-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-profile-drop__header {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-profile-drop__name {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.dashboard-profile-drop__email {
+  margin: 2px 0 0;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--gray-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-profile-drop__row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-900);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.dashboard-profile-drop__row:hover {
+  background: var(--gray-50);
+}
+
+.dashboard-profile-drop__row--danger {
+  color: #dc2626;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-profile-drop__row--danger:hover {
+  background: #fef2f2;
+}
