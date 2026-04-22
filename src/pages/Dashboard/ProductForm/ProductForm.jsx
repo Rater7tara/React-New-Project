@@ -21,6 +21,8 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
     name: product?.name || '',
     category: product?.category || '',
     price: product?.price || '',
+    oldPrice: product?.oldPrice || '',
+    brand: product?.brand || '',
     description: product?.description || '',
     stock: product?.stock || '',
     image: product?.image || '',
@@ -31,6 +33,8 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
 
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(product?.image || '');
+  const [imageMode, setImageMode] = useState('url');
+  const [imageFile, setImageFile] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +49,35 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
     const { value } = e.target;
     setFormData((prev) => ({ ...prev, image: value }));
     setImagePreview(value);
+    setImageFile(null);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      setFormData((prev) => ({ ...prev, image: '' }));
+      if (errors.image) {
+        setErrors((prev) => ({ ...prev, image: '' }));
+      }
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      setFormData((prev) => ({ ...prev, image: '' }));
+      setImageMode('upload');
+      if (errors.image) {
+        setErrors((prev) => ({ ...prev, image: '' }));
+      }
+    }
   };
 
   const toggleSize = (size) => {
@@ -73,7 +106,7 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
     if (!formData.stock || formData.stock < 0) newErrors.stock = 'Valid stock quantity is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.image.trim()) newErrors.image = 'Product image URL is required';
+    if (!formData.image.trim() && !imageFile) newErrors.image = 'Product image is required';
     if (formData.sizes.length === 0) newErrors.sizes = 'Select at least one size';
     if (formData.colors.length === 0) newErrors.colors = 'Select at least one color';
 
@@ -84,7 +117,9 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit(formData);
+      const submitData = { ...formData, imageFile };
+      console.log('Product Form Submit Data:', submitData);
+      onSubmit(submitData);
     }
   };
 
@@ -145,7 +180,7 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
                 {errors.category && <span className='form-error'>{errors.category}</span>}
               </div>
 
-              {/* Price and Stock */}
+              {/* Price and Old Price */}
               <div className='form-row'>
                 <div className='form-group'>
                   <label className='form-label'>
@@ -165,6 +200,24 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
 
                 <div className='form-group'>
                   <label className='form-label'>
+                    Old Price (৳)
+                  </label>
+                  <input
+                    type='number'
+                    name='oldPrice'
+                    value={formData.oldPrice}
+                    onChange={handleChange}
+                    placeholder='1599'
+                    min='0'
+                    className='form-input'
+                  />
+                </div>
+              </div>
+
+              {/* Stock and Brand */}
+              <div className='form-row'>
+                <div className='form-group'>
+                  <label className='form-label'>
                     Stock <span className='required'>*</span>
                   </label>
                   <input
@@ -177,6 +230,20 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
                     className={`form-input ${errors.stock ? 'error' : ''}`}
                   />
                   {errors.stock && <span className='form-error'>{errors.stock}</span>}
+                </div>
+
+                <div className='form-group'>
+                  <label className='form-label'>
+                    Brand Name
+                  </label>
+                  <input
+                    type='text'
+                    name='brand'
+                    value={formData.brand}
+                    onChange={handleChange}
+                    placeholder='e.g., Aarong, Yellow'
+                    className='form-input'
+                  />
                 </div>
               </div>
 
@@ -209,19 +276,76 @@ const ProductForm = ({ product = null, onSubmit, onCancel }) => {
 
             {/* Right Column */}
             <div className='product-form-col'>
-              {/* Image URL */}
+              {/* Product Image */}
               <div className='form-group'>
                 <label className='form-label'>
-                  Product Image URL <span className='required'>*</span>
+                  Product Image <span className='required'>*</span>
                 </label>
-                <input
-                  type='url'
-                  name='image'
-                  value={formData.image}
-                  onChange={handleImageChange}
-                  placeholder='https://example.com/image.jpg'
-                  className={`form-input ${errors.image ? 'error' : ''}`}
-                />
+                <div className='image-mode-tabs'>
+                  <button
+                    type='button'
+                    className={`image-mode-tab ${imageMode === 'url' ? 'active' : ''}`}
+                    onClick={() => setImageMode('url')}
+                  >
+                    <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' />
+                      <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' />
+                    </svg>
+                    Image URL
+                  </button>
+                  <button
+                    type='button'
+                    className={`image-mode-tab ${imageMode === 'upload' ? 'active' : ''}`}
+                    onClick={() => setImageMode('upload')}
+                  >
+                    <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
+                      <polyline points='17 8 12 3 7 8' />
+                      <line x1='12' y1='3' x2='12' y2='15' />
+                    </svg>
+                    File Upload
+                  </button>
+                </div>
+
+                {imageMode === 'url' ? (
+                  <input
+                    type='url'
+                    name='image'
+                    value={formData.image}
+                    onChange={handleImageChange}
+                    placeholder='https://example.com/image.jpg'
+                    className={`form-input ${errors.image ? 'error' : ''}`}
+                  />
+                ) : (
+                  <div
+                    className={`file-upload-area ${errors.image ? 'error' : ''} ${imageFile ? 'has-file' : ''}`}
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleFileChange}
+                      className='file-upload-input'
+                      id='product-image-upload'
+                    />
+                    <label htmlFor='product-image-upload' className='file-upload-label'>
+                      {imageFile ? (
+                        <span className='file-upload-name'>{imageFile.name}</span>
+                      ) : (
+                        <>
+                          <svg width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5'>
+                            <rect x='3' y='3' width='18' height='18' rx='2' ry='2' />
+                            <circle cx='8.5' cy='8.5' r='1.5' />
+                            <polyline points='21 15 16 10 5 21' />
+                          </svg>
+                          <span>Click to upload or drag & drop</span>
+                          <span className='file-upload-hint'>PNG, JPG, WEBP (max 5MB)</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                )}
                 {errors.image && <span className='form-error'>{errors.image}</span>}
               </div>
 

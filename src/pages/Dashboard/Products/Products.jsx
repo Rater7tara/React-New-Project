@@ -62,7 +62,7 @@ const MOCK_PRODUCTS = [
   },
   {
     id: 7,
-    image: 'https://images.unsplash.com/photo-1598032895397-b9a29e57348a?w=300&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Rm9ybWFsJTIwQmxhemVyfGVufDB8fDB8fHww',
     name: 'Formal Blazer',
     category: 'Women',
     price: 5999,
