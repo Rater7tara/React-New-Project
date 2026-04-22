@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './TrendingProducts.css';
 import { useCart } from '../../../context/CartContext';
 import ProductQuickView from '../../../components/ProductQuickView/ProductQuickView';
@@ -91,6 +92,7 @@ const TrendingProducts = () => {
   const [filter, setFilter] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { addToCart, addToWishlist, isInWishlist } = useCart();
+  const navigate = useNavigate();
   const filters = ['All', 'Women', 'Men', 'Kids', 'Accessories'];
 
   const filteredProducts = filter === 'All'
@@ -162,14 +164,14 @@ const TrendingProducts = () => {
         <div className='tp-grid'>
           {filteredProducts.map(product => (
             <div key={product.id} className='tp-product'>
-              <div className='tp-product__img-wrap'>
+              <div className='tp-product__img-wrap' onClick={() => navigate(`/product/${product.id}`)} style={{ cursor: 'pointer' }}>
                 <img src={product.image} alt={product.name} className='tp-product__img' />
                 {product.badge && (
                   <span className={`tp-product__badge tp-product__badge--${product.badge.toLowerCase()}`}>
                     {product.badge}
                   </span>
                 )}
-                <div className='tp-product__actions'>
+                <div className='tp-product__actions' onClick={(e) => e.stopPropagation()}>
                   <button
                     className={`tp-product__icon${isInWishlist(product.id) ? ' tp-product__icon--active' : ''}`}
                     onClick={() => handleWishlist(product)}
@@ -192,7 +194,7 @@ const TrendingProducts = () => {
                 </div>
                 <button
                   className='tp-product__cart'
-                  onClick={() => handleAddToCart(product)}
+                  onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                 >
                   <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
                     <path d='M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z' />
@@ -204,7 +206,7 @@ const TrendingProducts = () => {
               </div>
               <div className='tp-product__info'>
                 <span className='tp-product__cat'>{product.category}</span>
-                <h3 className='tp-product__name'>{product.name}</h3>
+                <h3 className='tp-product__name' onClick={() => navigate(`/product/${product.id}`)} style={{ cursor: 'pointer' }}>{product.name}</h3>
                 <div className='tp-product__price'>
                   <span className='tp-product__current'>৳{product.price.toLocaleString()}</span>
                   {product.oldPrice && (

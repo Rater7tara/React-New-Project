@@ -15,6 +15,7 @@ import Orders from "../pages/Dashboard/Orders/Orders";
 import Users from "../pages/Dashboard/Users/Users";
 import Settings from "../pages/Dashboard/Settings/Settings";
 import ManageBanner from "../pages/Dashboard/ManageBanner/ManageBanner";
+import ProductDetails from "../pages/ProductDetails/ProductDetails";
 import PrivateRoute from "./PrivateRoute";
 
 export const router = createBrowserRouter([
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: "/wishlist",
         element: <Wishlist />,
+      },
+      {
+        path: "/product/:id",
+        element: <ProductDetails />,
       },
     ],
   },
